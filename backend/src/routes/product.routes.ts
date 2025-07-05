@@ -1,12 +1,12 @@
-import {NextFunction, Request, Response, Router} from 'express';
+import {Router} from 'express';
+import {create, getAll, getById, remove, update} from '../controllers/product.controller';
 
 const router = Router();
 
-/* GET home page. */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-router.get('/products', (req: Request, res: Response, _next: NextFunction) => {
-  res.render('products', { title: 'Products' });
-});
+router.get('/', getAll);
+router.get('/:id', getById);
+router.post('/',create);
+router.patch('/:id', update);
+router.delete('/:id', remove);
 
 export default router;
-

@@ -31,3 +31,8 @@ This folder serves as the scaffold of the application that is a part of the inte
 We wish you good luck and a clear mind! We are looking forward to seeing you!
 
 PS: We should be able to run application locally, thus start the backend and be able to use endpoints through the curl/postman.
+
+``
+curl -X POST http://localhost:3000/products -H "Content-Type: application/json" \
+  -d '{"name":"Banana","quantity":100,"unitPrice":0.5}'
+``
