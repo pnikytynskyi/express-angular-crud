@@ -6,44 +6,54 @@ import {
 } from '../validators/product.validator';
 import { ProductErrors } from '../types/product';
 
-export const getAll: RequestHandler = async (req, res) => {
+export const getAll: RequestHandler = async (req, res, next) => {
   const limit = parseInt(req.query.limit as string) || 10;
   const page = parseInt(req.query.page as string) || 1;
   const offset = (page - 1) * limit;
+  try {
+    const { total, products } = await service.getAllWithCount(limit, offset);
+    const totalPages = Math.ceil(total / limit);
 
-  const { total, products } = await service.getAllWithCount(limit, offset);
-  const totalPages = Math.ceil(total / limit);
-
-  res.json({
-    data: products,
-    meta: {
-      total,
-      page,
-      totalPages,
-    },
-  });
-};
-
-export const getById: RequestHandler = async (req, res) => {
-  const id = +req.params.id;
-  const product = await service.getById(id);
-  if (!product) {
-    res.status(404).json({ error: ProductErrors.NOT_FOUND });
-    return;
+    res.json({
+      data: products,
+      meta: {
+        total,
+        page,
+        totalPages,
+      },
+    });
+  } catch (e) {
+    next(e);
   }
-
-  res.json(product);
 };
 
-export const create: RequestHandler = async (req, res) => {
+export const getById: RequestHandler = async (req, res, next) => {
+  const id = +req.params.id;
+  try {
+    const product = await service.getById(id);
+    if (!product) {
+      res.status(404).json({ error: ProductErrors.NOT_FOUND });
+      return;
+    }
+
+    res.json(product);
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const create: RequestHandler = async (req, res, next) => {
   const parsed = productSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json(parsed.error.flatten());
     return;
   }
-
-  const product = await service.create(parsed.data);
-  res.status(201).json(product);
+  try {
+    const product = await service.create(parsed.data);
+    res.status(201).json(product);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const update: RequestHandler = async (req, res, next) => {
