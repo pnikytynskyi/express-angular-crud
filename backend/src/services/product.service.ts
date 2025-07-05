@@ -1,7 +1,6 @@
 import {PrismaClient, Product} from '../generated/prisma'
 
 const prisma = new PrismaClient()
-// use `prisma` in your application to read and write data in your DB
 
 export type CreateData = Omit<Product, 'id'>;
 

@@ -1,9 +1,12 @@
-import {Request, Response} from 'express';
+import { RequestHandler } from 'express';
 import * as service from '../services/product.service';
-import {productSchema, productUpdateSchema} from '../validators/product.validator';
-import {ProductErrors} from "../types/product";
+import {
+  productSchema,
+  productUpdateSchema,
+} from '../validators/product.validator';
+import { ProductErrors } from '../types/product';
 
-export const getAll = async (req: Request, res: Response) => {
+export const getAll: RequestHandler = async (req, res) => {
   const limit = parseInt(req.query.limit as string) || 10;
   const page = parseInt(req.query.page as string) || 1;
   const offset = (page - 1) * limit;
@@ -21,40 +24,49 @@ export const getAll = async (req: Request, res: Response) => {
   });
 };
 
-export const getById = async (req: Request, res: Response) => {
+export const getById: RequestHandler = async (req, res) => {
   const id = +req.params.id;
   const product = await service.getById(id);
-  if (!product) return res.status(404).json({ error: ProductErrors.NOT_FOUND });
+  if (!product) {
+    res.status(404).json({ error: ProductErrors.NOT_FOUND });
+    return;
+  }
+
   res.json(product);
 };
 
-export const create = async (req: Request, res: Response) => {
+export const create: RequestHandler = async (req, res) => {
   const parsed = productSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json(parsed.error.flatten());
+  if (!parsed.success) {
+    res.status(400).json(parsed.error.flatten());
+    return;
+  }
+
   const product = await service.create(parsed.data);
   res.status(201).json(product);
 };
 
-export const update = async (req: Request, res: Response) => {
+export const update: RequestHandler = async (req, res, next) => {
   const id = +req.params.id;
   const parsed = productUpdateSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json(parsed.error.flatten());
+  if (!parsed.success) {
+    res.status(400).json(parsed.error.flatten());
+    return;
+  }
   try {
     const product = await service.update(id, parsed.data);
     res.json(product);
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: ProductErrors.UNKNOWN });
+    next(e);
   }
 };
 
-export const remove = async (req: Request, res: Response) => {
+export const remove: RequestHandler = async (req, res, next) => {
   const id = +req.params.id;
   try {
     await service.remove(id);
     res.status(204).send();
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: ProductErrors.UNKNOWN });
+    next(e);
   }
 };
