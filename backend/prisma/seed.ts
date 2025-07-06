@@ -1,13 +1,37 @@
-import {PrismaClient} from '../src/generated/prisma';
+import { PrismaClient } from '../src/generated/prisma';
 
 const prisma = new PrismaClient();
 
 async function main() {
   const products = [
-    { name: 'Laptop', quantity: 10, unitPrice: 999.99 },
-    { name: 'Mouse', quantity: 50, unitPrice: 25.5 },
-    { name: 'Keyboard', quantity: 30, unitPrice: 75.0 },
-    { name: 'Monitor', quantity: 20, unitPrice: 200.0 },
+    {
+      name: 'Laptop',
+      quantity: 10,
+      unitPrice: 999.99,
+      imageUrl: 'assets/logo_black.svg',
+      description: 'High performance laptop for professionals',
+    },
+    {
+      name: 'Mouse',
+      quantity: 50,
+      unitPrice: 25.5,
+      imageUrl: 'assets/logo_black.svg',
+      description: 'Ergonomic wireless mouse',
+    },
+    {
+      name: 'Keyboard',
+      quantity: 30,
+      unitPrice: 75.0,
+      imageUrl: 'assets/logo_black.svg',
+      description: 'Mechanical keyboard with backlight',
+    },
+    {
+      name: 'Monitor',
+      quantity: 20,
+      unitPrice: 200.0,
+      imageUrl: 'assets/logo_black.svg',
+      description: '24-inch full HD monitor',
+    },
   ];
 
   for (const product of products) {
@@ -26,6 +50,7 @@ async function main() {
       });
     }
   }
+
   console.log('Seed data created');
 }
 

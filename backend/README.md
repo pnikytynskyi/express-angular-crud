@@ -34,5 +34,5 @@ PS: We should be able to run application locally, thus start the backend and be 
 
 ``
 curl -X POST http://localhost:3000/products -H "Content-Type: application/json" \
-  -d '{"name":"Banana","quantity":100,"unitPrice":0.5}'
+  -d '{"name":"Banana","quantity":100,"unitPrice":0.5, "description":"some description", "imageUrl":"url""}'
 ``

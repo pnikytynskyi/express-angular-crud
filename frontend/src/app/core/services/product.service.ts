@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {Product} from '../models/product';
+import {map, Observable} from 'rxjs';
+import {WarehouseItem} from "../models/warehouseItem";
 
 @Injectable({
   providedIn: 'root'
@@ -11,20 +11,22 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.apiUrl);
+  getAll(): Observable<WarehouseItem[]> {
+    return this.http.get<{ data: WarehouseItem[] }>(this.apiUrl).pipe(
+      map(response => response.data)
+    );
   }
 
-  getById(id: number): Observable<Product> {
-    return this.http.get<Product>(`${this.apiUrl}/${id}`);
+  getById(id: number): Observable<WarehouseItem> {
+    return this.http.get<WarehouseItem>(`${this.apiUrl}/${id}`);
   }
 
-  create(product: Omit<Product, 'id'>): Observable<Product> {
-    return this.http.post<Product>(this.apiUrl, product);
+  create(product: Omit<WarehouseItem, 'id'>): Observable<WarehouseItem> {
+    return this.http.post<WarehouseItem>(this.apiUrl, product);
   }
 
-  update(product: Product): Observable<Product> {
-    return this.http.put<Product>(`${this.apiUrl}/${product.id}`, product);
+  update(product: WarehouseItem): Observable<WarehouseItem> {
+    return this.http.put<WarehouseItem>(`${this.apiUrl}/${product.id}`, product);
   }
 
   delete(id: number): Observable<void> {

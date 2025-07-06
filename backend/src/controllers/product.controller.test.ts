@@ -31,27 +31,45 @@ describe('Product Controller', () => {
   });
 
   describe('getAll', () => {
-    it('should return paginated products with meta', async () => {
+    it('should return paginated products with meta including imageUrl and description', async () => {
       const req = createMockRequest({ query: { limit: '2', page: '1' } });
       const res = createMockResponse();
 
       mockedService.getAllWithCount.mockResolvedValue({
         total: 3,
-        products: [{ id: 1, name: 'P1', quantity: 1, unitPrice: 10 }],
+        products: [
+          {
+            id: 1,
+            name: 'P1',
+            quantity: 1,
+            unitPrice: 10,
+            imageUrl: 'https://example.com/p1.png',
+            description: 'Product 1 desc',
+          },
+        ],
       });
 
       await getAll(req, res, next);
 
       expect(mockedService.getAllWithCount).toHaveBeenCalledWith(2, 0);
       expect(res.json).toHaveBeenCalledWith({
-        data: [{ id: 1, name: 'P1', quantity: 1, unitPrice: 10 }],
+        data: [
+          {
+            id: 1,
+            name: 'P1',
+            quantity: 1,
+            unitPrice: 10,
+            imageUrl: 'https://example.com/p1.png',
+            description: 'Product 1 desc',
+          },
+        ],
         meta: { total: 3, page: 1, totalPages: 2 },
       });
     });
   });
 
   describe('getById', () => {
-    it('should return product if found', async () => {
+    it('should return product if found with imageUrl and description', async () => {
       const req = createMockRequest({ params: { id: '1' } });
       const res = createMockResponse();
 
@@ -60,6 +78,8 @@ describe('Product Controller', () => {
         name: 'P1',
         quantity: 1,
         unitPrice: 10,
+        imageUrl: 'https://example.com/p1.png',
+        description: 'Product 1 desc',
       });
 
       await getById(req, res, next);
@@ -70,6 +90,8 @@ describe('Product Controller', () => {
         name: 'P1',
         quantity: 1,
         unitPrice: 10,
+        imageUrl: 'https://example.com/p1.png',
+        description: 'Product 1 desc',
       });
     });
 
@@ -87,9 +109,15 @@ describe('Product Controller', () => {
   });
 
   describe('create', () => {
-    it('should create product with valid data', async () => {
+    it('should create product with valid data including imageUrl and description', async () => {
       const req = createMockRequest({
-        body: { name: 'P1', quantity: 5, unitPrice: 50 },
+        body: {
+          name: 'P1',
+          quantity: 5,
+          unitPrice: 50,
+          imageUrl: 'https://example.com/p1.png',
+          description: 'Product 1 desc',
+        },
       });
       const res = createMockResponse();
 
@@ -117,10 +145,14 @@ describe('Product Controller', () => {
   });
 
   describe('update', () => {
-    it('should update product with valid data', async () => {
+    it('should update product with valid data including imageUrl and description', async () => {
       const req = createMockRequest({
         params: { id: '1' },
-        body: { quantity: 20 },
+        body: {
+          quantity: 20,
+          imageUrl: 'https://example.com/p1-new.png',
+          description: 'Updated desc',
+        },
       });
       const res = createMockResponse();
 
@@ -129,16 +161,20 @@ describe('Product Controller', () => {
         name: 'P1',
         quantity: 20,
         unitPrice: 50,
+        imageUrl: 'https://example.com/p1-new.png',
+        description: 'Updated desc',
       });
 
       await update(req, res, next);
 
-      expect(mockedService.update).toHaveBeenCalledWith(1, { quantity: 20 });
+      expect(mockedService.update).toHaveBeenCalledWith(1, req.body);
       expect(res.json).toHaveBeenCalledWith({
         id: 1,
         name: 'P1',
         quantity: 20,
         unitPrice: 50,
+        imageUrl: 'https://example.com/p1-new.png',
+        description: 'Updated desc',
       });
     });
 
@@ -184,6 +220,8 @@ describe('Product Controller', () => {
         name: 'P1',
         quantity: 5,
         unitPrice: 50,
+        imageUrl: 'https://example.com/p1.png',
+        description: 'Product 1 desc',
       });
 
       await remove(req, res, next);

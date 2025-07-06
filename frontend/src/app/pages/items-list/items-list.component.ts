@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {ListItemComponent} from "./list-item/list-item.component";
+import {ProductService} from "../../core/services/product.service";
 import {Observable, of} from "rxjs";
 import {WarehouseItem} from "../../core/models/warehouseItem";
-import {ItemsMockService} from "./items.mock.service";
 
 @Component({
   selector: 'app-items-list',
@@ -12,12 +12,20 @@ import {ItemsMockService} from "./items.mock.service";
   templateUrl: './items-list.component.html',
   styleUrls: ['./items-list.component.scss']
 })
-export class ItemsListComponent  {
-  items$: Observable<WarehouseItem[]> = this.itemsMockService.items
+export class ItemsListComponent  implements OnInit {
+  items$: Observable<WarehouseItem[]>;
 
-  constructor(private itemsMockService: ItemsMockService) { }
+  constructor(private productService: ProductService) {}
 
-  addItemToShipment(id: number): void {
-    this.itemsMockService.addToShipment(id)
+  ngOnInit(): void {
+    this.loadProducts();
   }
+
+  loadProducts(): void {
+    this.productService.getAll().subscribe((data) => {
+      console.log('Received from API:', data);
+      this.items$ = of(data);
+    });
+  }
+  addItemToShipment(id: number): void {}
 }
