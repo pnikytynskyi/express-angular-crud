@@ -6,7 +6,8 @@ const routes: Routes = [
   {
     path: '',
     component: ItemsListComponent
-  }
+  },
+  { path: 'products', loadChildren: () => import('./features/products/products.module').then(m => m.ProductsModule) }
 ];
 
 @NgModule({
