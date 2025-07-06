@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
@@ -6,14 +6,9 @@ import cors from 'cors';
 
 import indexRouter from './routes/index';
 import productsRouter from './routes/product.routes';
-import { ProductErrors } from './types/product';
+import ErrorHandlingMiddleware from './middlewares/error-handling.middleware';
 
 const app = express();
-
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  console.error(err);
-  res.status(500).json({ error: ProductErrors.UNKNOWN });
-});
 
 app.use(logger('dev'));
 app.use(cors());
@@ -25,4 +20,5 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use('/', indexRouter);
 app.use('/products', productsRouter);
 
+app.use(ErrorHandlingMiddleware);
 export default app;

@@ -8,10 +8,14 @@ import {
 import * as service from '../services/product.service';
 import { ProductErrors } from '../types/product';
 import { NextFunction, Request, Response } from 'express';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 jest.mock('../services/product.service');
 const mockedService = service as jest.Mocked<typeof service>;
-
+const mockP2025Error = new PrismaClientKnownRequestError('No Product found', {
+  code: 'P2025',
+  clientVersion: '0',
+});
 const createMockResponse = (): Response => {
   const res: Partial<Response> = {};
   res.status = jest.fn().mockReturnValue(res as Response);
@@ -244,6 +248,15 @@ describe('Product Controller', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: ProductErrors.UNKNOWN });
+    });
+
+    it('should handle NOT_FOUND delete errors gracefully', async () => {
+      jest.spyOn(mockedService, 'remove').mockRejectedValue(mockP2025Error);
+      const req = createMockRequest({ params: { id: '1' } });
+      const res = createMockResponse();
+      await remove(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(mockP2025Error);
     });
   });
 });

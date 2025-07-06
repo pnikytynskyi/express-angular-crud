@@ -6,6 +6,8 @@ import {
 } from '../validators/product.validator';
 import { ProductErrors } from '../types/product';
 
+export const NOT_FOUND_PRISMA_CODE = 'P2025';
+
 export const getAll: RequestHandler = async (req, res, next) => {
   const limit = parseInt(req.query.limit as string) || 10;
   const page = parseInt(req.query.page as string) || 1;
@@ -63,6 +65,7 @@ export const update: RequestHandler = async (req, res, next) => {
     res.status(400).json(parsed.error.flatten());
     return;
   }
+
   try {
     const product = await service.update(id, parsed.data);
     res.json(product);
