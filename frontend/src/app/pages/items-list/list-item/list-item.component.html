@@ -1,6 +1,6 @@
 <div class="list-item">
   <div class="list-item--image">
-    <img [src]="item.imageUrl" alt="warehouse-item-image" />
+    <img [src]="item.imageUrl" alt="alt-warehouse-item-image" />
   </div>
   <div class="list-item--content">
     <span><b>{{ item.name }}</b></span>
@@ -8,6 +8,6 @@
   </div>
   <span>{{ item.quantity }}x</span>
   <span>{{ item.unitPrice | currency: 'EUR' }}</span>
-  <button (click)="deleteItem.emit(item.id)" class="list-item--button">Delete</button>
-  <button (click)="startEdit.emit(item)">Edit</button>
+  <button (click)="deleteItem.emit(item.id)" class="list-item--button" data-testid="delete-button">Delete</button>
+  <button (click)="startEdit.emit(item)" data-testid="edit-button">Edit</button>
 </div>

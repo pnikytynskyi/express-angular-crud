@@ -34,11 +34,11 @@ function normalizePort(val: string): number | string | false {
   const port = parseInt(val, 10);
 
   if (isNaN(port)) {
-    return val; // named pipe
+    return val;
   }
 
   if (port >= 0) {
-    return port; // port number
+    return port;
   }
 
   return false;
@@ -52,8 +52,7 @@ function onError(error: NodeJS.ErrnoException): void {
     throw error;
   }
 
-  const bind =
-    typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+  const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
   switch (error.code) {
     case 'EACCES':

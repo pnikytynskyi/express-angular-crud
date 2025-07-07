@@ -60,7 +60,7 @@ describe('Product Service', () => {
     expect(updated.quantity).toBe(updatedData.quantity);
     expect(updated.imageUrl).toBe(updatedData.imageUrl);
     expect(updated.description).toBe(updatedData.description);
-    expect(updated.name).toBe('Keyboard'); // unchanged
+    expect(updated.name).toBe('Keyboard');
   });
 
   it('should delete a product', async () => {
@@ -77,7 +77,6 @@ describe('Product Service', () => {
   });
 
   it('should get paginated products with count including new fields', async () => {
-    // Seed multiple products
     const productsData = [
       {
         name: 'P1',

@@ -26,7 +26,7 @@ export class ProductService {
   }
 
   update(product: WarehouseItem): Observable<WarehouseItem> {
-    return this.http.put<WarehouseItem>(`${this.apiUrl}/${product.id}`, product);
+    return this.http.patch<WarehouseItem>(`${this.apiUrl}/${product.id}`, product);
   }
 
   delete(id: number): Observable<void> {

@@ -1,9 +1,32 @@
 <form (ngSubmit)="onSubmit()" [formGroup]="productForm">
-  <input formControlName="name" placeholder="Product name" type="text" />
-  <input formControlName="quantity" placeholder="Quantity" type="number" />
-  <input formControlName="unitPrice" placeholder="Unit price in EUR" type="number" />
-  <input formControlName="imageUrl" placeholder="Image URL" type="text" />
-  <textarea formControlName="description" placeholder="Description"></textarea>
-  <br>
-  <button type="submit">{{ product ? 'Update' : 'Create' }} Product</button>
+  <label>
+    Product Name:<br />
+    <input formControlName="name" placeholder="Product name" type="text" />
+  </label>
+  <br />
+  <label>
+    Quantity:<br />
+    <input formControlName="quantity" placeholder="Quantity" type="number" />
+  </label>
+  <br />
+  <label>
+    Unit Price (EUR):<br />
+    <input formControlName="unitPrice" placeholder="Unit price in EUR" type="number" />
+  </label>
+  <br />
+  <label>
+    Image URL:<br />
+    <input formControlName="imageUrl" placeholder="Image URL" type="text" />
+  </label>
+  <br />
+  <label>
+    Description:<br />
+    <textarea formControlName="description" placeholder="Description"></textarea>
+  </label>
+
+  <br />
+
+  <button type="submit">
+    {{ product ? 'Update' : 'Create' }} Product
+  </button>
 </form>
