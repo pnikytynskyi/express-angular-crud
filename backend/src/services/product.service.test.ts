@@ -1,143 +1,117 @@
-import * as service from '../services/product.service';
+jest.mock('../../prisma/client');
+
 import prisma from '../../prisma/client';
+import * as service from './product.service';
 
-describe('Product Service', () => {
-  const createdProductIds: number[] = [];
-
-  afterAll(async () => {
-    // Remove only the products created during this test run
-    await prisma.product.deleteMany({
-      where: {
-        id: { in: createdProductIds },
-      },
-    });
-    createdProductIds.length = 0;
-  });
-
-  afterAll(async () => {
-    await prisma.$disconnect();
+describe('Product Service ', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should create a product with imageUrl and description', async () => {
-    const data = {
+    const mockResponse = {
+      id: 1,
       name: 'Laptop',
       quantity: 5,
       unitPrice: 999.99,
       imageUrl: 'https://example.com/laptop.png',
       description: 'High-end gaming laptop',
     };
-    const created = await service.create(data);
-    createdProductIds.push(created.id);
 
-    expect(created.id).toBeDefined();
-    expect(created.name).toBe(data.name);
-    expect(created.imageUrl).toBe(data.imageUrl);
-    expect(created.description).toBe(data.description);
+    (prisma.product.create as jest.Mock).mockResolvedValue(mockResponse);
+
+    const result = await service.create({
+      name: mockResponse.name,
+      quantity: mockResponse.quantity,
+      unitPrice: mockResponse.unitPrice,
+      imageUrl: mockResponse.imageUrl,
+      description: mockResponse.description,
+    });
+
+    expect(prisma.product.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ name: 'Laptop' }),
+    });
+    expect(result).toEqual(mockResponse);
   });
 
-  it('should get product by id with all fields', async () => {
-    const data = {
+  it('should return a product by ID', async () => {
+    const mockProduct = {
+      id: 1,
       name: 'Mouse',
       quantity: 10,
       unitPrice: 25,
       imageUrl: 'https://example.com/mouse.png',
       description: 'Wireless mouse',
     };
-    const created = await service.create(data);
-    createdProductIds.push(created.id);
 
-    const found = await service.getById(created.id);
-    expect(found).not.toBeNull();
-    expect(found?.name).toBe(data.name);
-    expect(found?.imageUrl).toBe(data.imageUrl);
-    expect(found?.description).toBe(data.description);
+    (prisma.product.findUnique as jest.Mock).mockResolvedValue(mockProduct);
+
+    const result = await service.getById(1);
+    expect(result).toEqual(mockProduct);
+    expect(prisma.product.findUnique).toHaveBeenCalledWith({
+      where: { id: 1 },
+    });
   });
 
-  it('should update product partially including imageUrl and description', async () => {
-    const created = await service.create({
+  it('should update a product', async () => {
+    const updated = {
+      id: 1,
       name: 'Keyboard',
-      quantity: 20,
-      unitPrice: 75,
-      imageUrl: 'https://example.com/keyboard.png',
-      description: 'Mechanical keyboard',
-    });
-    createdProductIds.push(created.id);
-
-    const updatedData = {
       quantity: 30,
+      unitPrice: 75,
       imageUrl: 'https://example.com/keyboard-new.png',
       description: 'Updated mechanical keyboard',
     };
 
-    const updated = await service.update(created.id, updatedData);
-    expect(updated.quantity).toBe(updatedData.quantity);
-    expect(updated.imageUrl).toBe(updatedData.imageUrl);
-    expect(updated.description).toBe(updatedData.description);
-    expect(updated.name).toBe('Keyboard');
+    (prisma.product.update as jest.Mock).mockResolvedValue(updated);
+
+    const result = await service.update(1, {
+      quantity: 30,
+      imageUrl: updated.imageUrl,
+      description: updated.description,
+    });
+
+    expect(prisma.product.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: expect.objectContaining({ quantity: 30 }),
+    });
+    expect(result).toEqual(updated);
   });
 
   it('should delete a product', async () => {
-    const created = await service.create({
-      name: 'Monitor',
-      quantity: 10,
-      unitPrice: 200,
-      imageUrl: 'https://example.com/monitor.png',
-      description: '4K UHD Monitor',
-    });
+    (prisma.product.delete as jest.Mock).mockResolvedValue({ id: 1 });
 
-    // No need to push to cleanup list since it's being deleted
-    await service.remove(created.id);
-
-    const found = await service.getById(created.id);
-    expect(found).toBeNull();
+    await expect(service.remove(1)).resolves.toEqual({ id: 1 });
+    expect(prisma.product.delete).toHaveBeenCalledWith({ where: { id: 1 } });
   });
 
-  it('should get paginated products with count including new fields', async () => {
-    const productsData = [
+  it('should return paginated products with count', async () => {
+    const mockProducts = [
       {
+        id: 1,
         name: 'P1',
         quantity: 1,
         unitPrice: 10,
-        imageUrl: 'https://example.com/p1.png',
-        description: 'Product 1 description',
+        imageUrl: '',
+        description: '',
       },
       {
+        id: 2,
         name: 'P2',
         quantity: 2,
         unitPrice: 20,
-        imageUrl: 'https://example.com/p2.png',
-        description: 'Product 2 description',
-      },
-      {
-        name: 'P3',
-        quantity: 3,
-        unitPrice: 30,
-        imageUrl: 'https://example.com/p3.png',
-        description: 'Product 3 description',
+        imageUrl: '',
+        description: '',
       },
     ];
 
-    for (const p of productsData) {
-      const created = await service.create(p);
-      createdProductIds.push(created.id);
-    }
+    (prisma.product.count as jest.Mock).mockResolvedValue(3);
+    (prisma.product.findMany as jest.Mock).mockResolvedValue(mockProducts);
 
-    const { total, products } = await service.getAllWithCount(2, 0);
-    expect(total).toBe(productsData.length);
-    expect(products.length).toBe(2);
+    const result = await service.getAllWithCount(2, 0);
 
-    expect(products[0].name).toBe('P1');
-    expect(products[0].imageUrl).toBe(productsData[0].imageUrl);
-    expect(products[0].description).toBe(productsData[0].description);
-
-    expect(products[1].name).toBe('P2');
-    expect(products[1].imageUrl).toBe(productsData[1].imageUrl);
-    expect(products[1].description).toBe(productsData[1].description);
-
-    const page2 = await service.getAllWithCount(2, 2);
-    expect(page2.products.length).toBe(1);
-    expect(page2.products[0].name).toBe('P3');
-    expect(page2.products[0].imageUrl).toBe(productsData[2].imageUrl);
-    expect(page2.products[0].description).toBe(productsData[2].description);
+    expect(prisma.product.count).toHaveBeenCalled();
+    expect(prisma.product.findMany).toHaveBeenCalledWith({ skip: 0, take: 2 });
+    expect(result).toEqual({ total: 3, products: mockProducts });
   });
 });

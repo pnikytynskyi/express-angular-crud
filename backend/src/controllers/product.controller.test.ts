@@ -2,6 +2,7 @@ import {
   create,
   getAll,
   getById,
+  NOT_FOUND_PRISMA_CODE,
   remove,
   update,
 } from '../controllers/product.controller';
@@ -13,7 +14,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 jest.mock('../services/product.service');
 const mockedService = service as jest.Mocked<typeof service>;
 const mockP2025Error = new PrismaClientKnownRequestError('No Product found', {
-  code: 'P2025',
+  code: NOT_FOUND_PRISMA_CODE,
   clientVersion: '0',
 });
 const createMockResponse = (): Response => {

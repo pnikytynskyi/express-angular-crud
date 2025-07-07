@@ -1,8 +1,7 @@
 import request from 'supertest';
 import app from '../app';
-import { PrismaClient } from '../generated/prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../prisma/client';
+import { randomUUID } from 'crypto';
 
 describe('Product API', () => {
   let createdProductId: number;
@@ -15,12 +14,24 @@ describe('Product API', () => {
       imageUrl: 'http://example.com/image.png',
       description: 'Test description',
     };
+    if (createdProductId) {
+      await prisma.product.delete({
+        where: {
+          id: createdProductId,
+        },
+      });
+    }
 
     const res = await request(app).post('/products').send(productData);
     createdProductId = res.body.id;
   };
 
   afterAll(async () => {
+    await prisma.product.deleteMany({
+      where: {
+        id: createdProductId,
+      },
+    });
     await prisma.$disconnect();
   });
 
@@ -83,8 +94,9 @@ describe('Product API', () => {
 
   describe('PATCH /products/:id', () => {
     it('should update existing product', async () => {
+      await withCreatedProduct();
       const updatedData = {
-        name: 'Updated Product',
+        name: `Updated Product ${randomUUID()}`,
         quantity: 10,
         unitPrice: 99.99,
         imageUrl: 'http://example.com/new-image.png',
@@ -109,6 +121,7 @@ describe('Product API', () => {
 
   describe('DELETE /products/:id', () => {
     it('should delete existing product', async () => {
+      await withCreatedProduct();
       const res = await request(app).delete(`/products/${createdProductId}`);
       expect(res.statusCode).toBe(204);
     });

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { ProductErrors } from '../types/product';
+import { NOT_FOUND_PRISMA_CODE } from '../controllers/product.controller';
 
 function isPrismaP2025Error(
   err: unknown,
@@ -9,7 +10,7 @@ function isPrismaP2025Error(
     typeof err === 'object' &&
     err !== null &&
     'code' in err &&
-    (err as any).code === 'P2025'
+    (err as any).code === NOT_FOUND_PRISMA_CODE
   );
 }
 

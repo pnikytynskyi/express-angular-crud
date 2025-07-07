@@ -124,3 +124,6 @@ Replace :id with actual product ID, e.g., 1
 ```
 curl -X DELETE http://localhost:3000/products/1
 ```
+TODO:
+- Create test DB
+- Refactoring

@@ -4,12 +4,13 @@ import request from 'supertest';
 import app from '../../src/app';
 import * as service from '../../src/services/product.service';
 import { ProductErrors } from '../types/product';
+import { NOT_FOUND_PRISMA_CODE } from '../controllers/product.controller';
 
 describe('Error middleware', () => {
   it('should handle Prisma P2025 error and return 404', async () => {
     const mockError = {
       name: 'PrismaClientKnownRequestError',
-      code: 'P2025',
+      code: NOT_FOUND_PRISMA_CODE,
       clientVersion: 'clientVersion_xyz',
     };
 
