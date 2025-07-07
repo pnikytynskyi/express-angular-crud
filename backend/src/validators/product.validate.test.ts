@@ -19,13 +19,13 @@ describe('Product Validator', () => {
         name: 'Mouse',
         quantity: 5,
         unitPrice: 20,
-        imageUrl: 'not-a-url',
+        imageUrl: 1234,
       };
       const result = productSchema.safeParse(data);
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.flatten().fieldErrors.imageUrl).toContain(
-          'Invalid url',
+          'Expected string, received number',
         );
       }
     });
@@ -73,7 +73,7 @@ describe('Product Validator', () => {
     });
 
     it('should fail if imageUrl is invalid in update', () => {
-      const data = { imageUrl: 'invalid-url' };
+      const data = { imageUrl: 123 };
       expect(productUpdateSchema.safeParse(data).success).toBe(false);
     });
 

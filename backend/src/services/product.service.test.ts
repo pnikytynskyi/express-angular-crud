@@ -1,15 +1,23 @@
 import * as service from '../services/product.service';
 import prisma from '../../prisma/client';
 
-beforeEach(async () => {
-  await prisma.product.deleteMany();
-});
-
-afterAll(async () => {
-  await prisma.$disconnect();
-});
-
 describe('Product Service', () => {
+  const createdProductIds: number[] = [];
+
+  afterAll(async () => {
+    // Remove only the products created during this test run
+    await prisma.product.deleteMany({
+      where: {
+        id: { in: createdProductIds },
+      },
+    });
+    createdProductIds.length = 0;
+  });
+
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
+
   it('should create a product with imageUrl and description', async () => {
     const data = {
       name: 'Laptop',
@@ -19,6 +27,8 @@ describe('Product Service', () => {
       description: 'High-end gaming laptop',
     };
     const created = await service.create(data);
+    createdProductIds.push(created.id);
+
     expect(created.id).toBeDefined();
     expect(created.name).toBe(data.name);
     expect(created.imageUrl).toBe(data.imageUrl);
@@ -34,6 +44,8 @@ describe('Product Service', () => {
       description: 'Wireless mouse',
     };
     const created = await service.create(data);
+    createdProductIds.push(created.id);
+
     const found = await service.getById(created.id);
     expect(found).not.toBeNull();
     expect(found?.name).toBe(data.name);
@@ -49,6 +61,7 @@ describe('Product Service', () => {
       imageUrl: 'https://example.com/keyboard.png',
       description: 'Mechanical keyboard',
     });
+    createdProductIds.push(created.id);
 
     const updatedData = {
       quantity: 30,
@@ -71,7 +84,10 @@ describe('Product Service', () => {
       imageUrl: 'https://example.com/monitor.png',
       description: '4K UHD Monitor',
     });
+
+    // No need to push to cleanup list since it's being deleted
     await service.remove(created.id);
+
     const found = await service.getById(created.id);
     expect(found).toBeNull();
   });
@@ -100,16 +116,20 @@ describe('Product Service', () => {
         description: 'Product 3 description',
       },
     ];
+
     for (const p of productsData) {
-      await service.create(p);
+      const created = await service.create(p);
+      createdProductIds.push(created.id);
     }
 
     const { total, products } = await service.getAllWithCount(2, 0);
     expect(total).toBe(productsData.length);
     expect(products.length).toBe(2);
+
     expect(products[0].name).toBe('P1');
     expect(products[0].imageUrl).toBe(productsData[0].imageUrl);
     expect(products[0].description).toBe(productsData[0].description);
+
     expect(products[1].name).toBe('P2');
     expect(products[1].imageUrl).toBe(productsData[1].imageUrl);
     expect(products[1].description).toBe(productsData[1].description);

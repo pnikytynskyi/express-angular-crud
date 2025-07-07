@@ -7,6 +7,19 @@ const prisma = new PrismaClient();
 describe('Product API', () => {
   let createdProductId: number;
 
+  const withCreatedProduct = async () => {
+    const productData = {
+      name: 'Test Product',
+      quantity: 5,
+      unitPrice: 12.34,
+      imageUrl: 'http://example.com/image.png',
+      description: 'Test description',
+    };
+
+    const res = await request(app).post('/products').send(productData);
+    createdProductId = res.body.id;
+  };
+
   afterAll(async () => {
     await prisma.$disconnect();
   });
@@ -55,6 +68,7 @@ describe('Product API', () => {
 
   describe('GET /products/:id', () => {
     it('should return product by ID', async () => {
+      await withCreatedProduct();
       const res = await request(app).get(`/products/${createdProductId}`);
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty('id', createdProductId);

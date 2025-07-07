@@ -2,37 +2,125 @@
 
 This folder serves as the scaffold of the application that is a part of the interview process for candidates attending on the position in CloudTalk.
 
-## Assignment
+Backend API server built with Express, Prisma, and TypeScript.
 
-1. Warehouse application, needs API for following features
+---
 
-   1. Table of products that are available
-   2. Product definition (required properties)
+🚀 Getting Started
 
-      1. ID
-      2. Name
-      3. Quantity
-      4. Unit price (euros)
+Prerequisites:
 
-   3. Product manipulation
+- Node.js v22.11.0 or higher
+- npm package manager
 
-      1. CRUD operations
+- Set in .env:
+  ```
+  DATABASE_URL="file:./dev.db"
+Installation:
 
-   4. Shipments (optional)
+```
+npm install
+```
 
-2. Please at the development consider
+---
+🔧 Prisma Setup
 
-   1. Development best practises
-   2. Testing
-   3. Simulate a situation in which you work with the team (pay attention to how you work with Git)
+📦 Create your SQLite database:
 
-3. This is a bare minimum, there are no limits to creativity, just keep in mind what we wanted
+```
+npx prisma migrate dev --name init
+```
+⚙️ Generate the client:
 
-We wish you good luck and a clear mind! We are looking forward to seeing you!
+```
+npx prisma generate
+```
 
-PS: We should be able to run application locally, thus start the backend and be able to use endpoints through the curl/postman.
+🌱 Seed sample data (optional):
 
-``
-curl -X POST http://localhost:3000/products -H "Content-Type: application/json" \
-  -d '{"name":"Banana","quantity":100,"unitPrice":0.5, "description":"some description", "imageUrl":"url""}'
-``
+```
+npm run seed
+```
+
+---
+
+Running the Development Server:
+
+```
+npm run start
+```
+
+
+Make sure your .env file is configured properly and Prisma migrations are applied before seeding.
+
+---
+
+🧪 Running Tests
+
+Run tests with Jest:
+
+```
+npm test
+```
+
+---
+
+🏪 Products API (/products):
+POST /products – Create a new product
+
+GET /products – List all products (paginated with page and limit query params)
+
+GET /products/:id – Get a product by ID
+
+PATCH /products/:id – Update a product by ID
+
+DELETE /products/:id – Delete a product by ID
+
+
+Create a new product (POST /products)
+```
+curl -X POST http://localhost:3000/products \
+-H "Content-Type: application/json" \
+-d '{
+"name": "Sample Product",
+"quantity": 100,
+"unitPrice": 29.99,
+"imageUrl": "http://example.com/image.jpg",
+"description": "This is a sample product."
+}'
+```
+
+
+Get all products (GET /products)
+
+Supports optional pagination query params: limit (default 10), page (default 1)
+```
+curl http://localhost:3000/products?limit=5&page=1
+```
+Get product by ID (GET /products/:id)
+
+Replace :id with actual product ID, e.g., 1
+```
+curl http://localhost:3000/products/1
+
+```
+
+Update product by ID (PATCH /products/:id)
+
+Replace :id with actual product ID, e.g., 1
+
+Partial update allowed, only send fields you want to change.
+```
+curl -X PATCH http://localhost:3000/products/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "quantity": 150,
+    "unitPrice": 25.50
+  }'
+
+```
+Delete product by ID (DELETE /products/:id)
+Replace :id with actual product ID, e.g., 1
+```
+curl -X DELETE http://localhost:3000/products/1
+```
